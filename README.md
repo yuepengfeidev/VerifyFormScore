@@ -1,7 +1,7 @@
 # VerifyFormScore
 识别表格分数并验证结果
 
-![](https://github.com/yuepengfeidev/VerifyFormScore/tree/master/gif/gif1.gif)
+![](https://github.com/yuepengfeidev/VerifyFormScore/blob/master/gif/gif1.gif)
 
 一、表格分数识别使用两种方法：
 1.TensorFlow识别，拥有60000手写数字的训练库，识别率较高，且稳定，只能一个一个字识别。
