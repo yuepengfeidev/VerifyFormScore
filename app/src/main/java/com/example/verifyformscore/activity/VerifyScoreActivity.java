@@ -7,7 +7,6 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -130,7 +129,7 @@ public class VerifyScoreActivity extends AppCompatActivity {
      * @param bitmap 表格模块图片
      */
     private void disposeForm(final Bitmap bitmap) {
-        isFisrtLoad =false;
+        isFisrtLoad = false;
         Observable<Map<Integer, List<Bitmap>>> observable = Observable.create(new ObservableOnSubscribe<Map<Integer, List<Bitmap>>>() {
             @Override
             public void subscribe(ObservableEmitter<Map<Integer, List<Bitmap>>> emitter) {
@@ -142,7 +141,6 @@ public class VerifyScoreActivity extends AppCompatActivity {
                 .subscribe(new Consumer<Map<Integer, List<Bitmap>>>() {
                     @Override
                     public void accept(Map<Integer, List<Bitmap>> scoreMap) {
-
                         if (scoreMap.size() < MIN_SOCRE_ITEM_COUNT) {
                             progressBar.setVisibility(View.GONE);
                             mToast.showToast("你拍照技术不行呀！重拍一下呗。");
@@ -163,12 +161,20 @@ public class VerifyScoreActivity extends AppCompatActivity {
      */
     private void recognizeScore(final Map<Integer, List<Bitmap>> scoreMap) {
         boolean isLast = false;
-        for (Map.Entry<Integer, List<Bitmap>> map : scoreMap.entrySet()) {
+        List<Map.Entry<Integer, List<Bitmap>>> mapList = new ArrayList<>(scoreMap.entrySet());
+        for (Map.Entry<Integer, List<Bitmap>> map : mapList) {
             List<Bitmap> bitmaps = map.getValue();
+            // 如果有分数板块为获取到数字图片，则重拍
+            if (bitmaps.size() == 0) {
+                progressBar.setVisibility(View.GONE);
+                mToast.showToast("你拍照技术不行呀！重拍一下呗。");
+                mExecutorService.shutdownNow();
+                return;
+            }
             for (final Bitmap bitmap : bitmaps) {
                 mBitmapList.add(bitmap);
                 // 当识别到最后一个模块的分数,且最后一位数字时，提醒是最后一张数字识别图片
-                if (map.getKey() == (scoreMap.size() - 1) &&
+                if (mapList.indexOf(map) == (scoreMap.size() - 1) &&
                         bitmaps.indexOf(bitmap) == (bitmaps.size() - 1)) {
                     isLast = true;
                 }
@@ -270,11 +276,12 @@ public class VerifyScoreActivity extends AppCompatActivity {
         int rcTotalScore = 0;
         // 组合的各模块分数相加的式子
         StringBuilder formulaString = new StringBuilder();
-        for (Integer score : scoreList) {
+        for (int i = 0; i < scoreList.size(); i++) {
+            int score = scoreList.get(i);
             // 最后一位是总分
-            if (scoreList.indexOf(score) < (scoreList.size() - 1)) {
+            if (i < scoreList.size() - 1) {
                 totalScore += score;
-                if (scoreList.indexOf(score) < (scoreList.size() - 2)) {
+                if (i < (scoreList.size() - 2)) {
                     String s = score + " + ";
                     formulaString.append(s);
                 } else {
@@ -287,11 +294,10 @@ public class VerifyScoreActivity extends AppCompatActivity {
             }
         }
 
-
         Bundle bundle = new Bundle();
-        bundle.putString("formulaString",formulaString.toString());
-        bundle.putInt("rcTotalScore",rcTotalScore);
-        bundle.putInt("totalScore",totalScore);
+        bundle.putString("formulaString", formulaString.toString());
+        bundle.putInt("rcTotalScore", rcTotalScore);
+        bundle.putInt("totalScore", totalScore);
         Message message = new Message();
         message.what = 1;
         message.setData(bundle);

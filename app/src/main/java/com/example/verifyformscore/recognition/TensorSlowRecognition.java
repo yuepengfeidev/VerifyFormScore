@@ -71,7 +71,8 @@ public class TensorSlowRecognition {
         bitmap.getPixels(mImagePixels, 0, bitmap.getWidth(), 0, 0,
                 bitmap.getWidth(), bitmap.getHeight());
         /*for (int i = 0; i < DIM_IMG_SIZE_WIDTH * DIM_IMG_SIZE_HEIGHT; i++) {
-            // 二值图(黑子白底)，黑色部分值为-16777216 白色部分为-1，要将黑色改为0，白色改为255f,才是对比识别
+            // 二值图(黑字白底)，黑色部分值为-16777216 白色部分为-1，要将黑色改为2ff，白色改为0
+            // 改为黑底白字，才能对比识别
             if (mImagePixels[i] == -1) {
                 mImageData[i] = 0;
             } else {
@@ -79,6 +80,7 @@ public class TensorSlowRecognition {
             }
         }*/
 
+        // 黑字白底 转为 黑底白字
         for (int i = 0; i < mImagePixels.length; ++i) {
             int pix = mImagePixels[i];
             pix = pix & 0xff;

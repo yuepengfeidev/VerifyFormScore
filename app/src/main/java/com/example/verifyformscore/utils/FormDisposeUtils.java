@@ -1,12 +1,10 @@
 package com.example.verifyformscore.utils;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
@@ -51,8 +49,7 @@ public class FormDisposeUtils {
         Imgproc.cvtColor(mat, disposeMat, Imgproc.COLOR_BGR2GRAY);
         // 自动阈值二值化，blockSize属性为加粗二值化后的边框线条
         Imgproc.adaptiveThreshold(disposeMat, disposeMat, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
-                Imgproc.THRESH_BINARY_INV, 7, 10);
-
+                Imgproc.THRESH_BINARY_INV, 17, 8);
         // 获取表格横纵线
         Mat horizontal = disposeMat.clone();
         Mat vertical = disposeMat.clone();
@@ -289,7 +286,9 @@ public class FormDisposeUtils {
                 // 将黑底白字二值化为黑字白底,便于识别
                 Imgproc.adaptiveThreshold(scoreMat, scoreMat, 255,
                         Imgproc.ADAPTIVE_THRESH_MEAN_C,
-                        Imgproc.THRESH_BINARY_INV, 23, -1);
+                        Imgproc.THRESH_BINARY_INV, 19, -1);
+                // 中值处理数字轮廓不平滑
+                Imgproc.medianBlur(scoreMat,scoreMat,3);
                 Bitmap b = Bitmap.createBitmap(scoreMat.width(), scoreMat.height(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(scoreMat, b);
                 bitmaps.add(b);

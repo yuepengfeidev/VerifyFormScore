@@ -43,6 +43,11 @@ public class MyApplication extends Application {
         sTensorSlowRecognition = new TensorSlowRecognition(context);
         // 初始化 tess-two
         sTessBaseAPI = new TessBaseAPI();
+        // 添加白名单 和 黑名单
+        String whiteList = "0123456789";
+        String blackList = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+=-[]}{;:'\\\"\\\\|~`,./<>? ";
+        sTessBaseAPI.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, whiteList);
+        sTessBaseAPI.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, blackList);
         // 字体库可通过 "+" 进行合并
         String lang = "number+number2+number3+number4+number5";
         // tesseract 指定设别的路径
